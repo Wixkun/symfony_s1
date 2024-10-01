@@ -15,4 +15,28 @@ class AdminController extends AbstractController
             'controller_name' => 'AdminController',
         ]);
     }
+
+    #[Route('/admin_add_films', name: 'app_admin_add_films')]
+    public function addFilm(): Response
+    {
+        return $this->render('admin/admin_add_films.html.twig', [
+            'controller_name' => 'AdminController',
+        ]);
+    }
+
+    #[Route('/admin_films', name: 'app_admin_films')]
+    public function film(): Response
+    {
+        return $this->render('admin/admin_films.html.twig', [
+            'controller_name' => 'AdminController',
+        ]);
+    }
+
+    #[Route('/admin_users', name: 'app_admin_users')]
+    public function users(): Response
+    {
+        return $this->render('admin/admin_users.html.twig', [
+            'controller_name' => 'AdminController',
+        ]);
+    }
 }
