@@ -7,6 +7,8 @@ use Doctrine\Persistence\ObjectManager;
 use App\Entity\User;
 use App\Entity\Subscription;
 use App\Entity\Media;
+use App\Entity\Serie;
+use App\Entity\Movie;
 use App\Entity\Playlist;
 
 class UserFixtures extends Fixture
@@ -33,7 +35,7 @@ class UserFixtures extends Fixture
         $abonnements->setName('Abonnement 10 jours');
         $abonnements->setPrice(50);
 
-        $media = new Media();
+        $media = random_int(min: 0, max: 1) === 0 ? new Movie() : new Serie();
         $media->setTitle('title1');
         $media->setLongDescription(longDescription: 'Long description');
         $media->setShortDescription(shortDescription: 'Short description');
