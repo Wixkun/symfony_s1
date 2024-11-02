@@ -25,6 +25,6 @@ App\Entity\Season:
 App\Entity\Episode:
   episode{1..100}:
     title: '<name()>'
-    duration: <numberBetween(30, 120)>
+    duration: <numberBetween(1, 120)>
     releasedAT: "<dateTimeBetween('-1 week', '+1 week')>"
     season: '@season*'
