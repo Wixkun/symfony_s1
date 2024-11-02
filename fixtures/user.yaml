@@ -1,0 +1,5 @@
+App\Entity\User:
+  user:
+    username: 'JeanPixouille'
+    email: 'jpx@gmail.com'
+    password: 'password'
