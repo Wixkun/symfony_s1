@@ -20,3 +20,4 @@ App\Entity\Language:
   lang_pt:
     name: 'Português'
     code: 'PT'
+  
