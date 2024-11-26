@@ -8,3 +8,15 @@ App\Entity\Language:
   lang_sp:
     name: 'Spanish'
     code: 'SP'
+  lang_de:
+    name: 'Deutsch'
+    code: 'DE'
+  lang_it:
+    name: 'Italiano'
+    code: 'IT'
+  lang_nl:
+    name: 'Nederlands'
+    code: 'NL'
+  lang_pt:
+    name: 'Português'
+    code: 'PT'

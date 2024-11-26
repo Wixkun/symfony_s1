@@ -8,7 +8,6 @@ App\Entity\Media:
       - '@category_action'
       - '@category_aventure'
 
-
 App\Entity\Movie:
   movie{1..50} (extends media):
     title: 'Film <current()>'
@@ -18,7 +17,7 @@ App\Entity\Serie:
     title: 'Serie <current()>'
 
 App\Entity\Season:
-  season{1..50}:
+  season_1{@serie*}:
     number: <numberBetween(1, 10)>
     serie: '@serie*'
 
