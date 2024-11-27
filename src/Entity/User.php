@@ -1,5 +1,7 @@
 <?php
 
+// src/Entity/User.php
+
 namespace App\Entity;
 
 use App\Enum\UserAccountStatusEnum;
@@ -61,6 +63,12 @@ class User
      */
     #[ORM\OneToMany(targetEntity: WatchHistory::class, mappedBy: 'watcher')]
     private Collection $watchHistories;
+
+    /**
+     * @var array<string>
+     */
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     public function __construct()
     {
@@ -157,7 +165,6 @@ class User
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getPublisher() === $this) {
                 $comment->setPublisher(null);
             }
@@ -187,7 +194,6 @@ class User
     public function removeSubscriptionHistory(SubscriptionHistory $subscriptionHistory): static
     {
         if ($this->subscriptionHistories->removeElement($subscriptionHistory)) {
-            // set the owning side to null (unless already changed)
             if ($subscriptionHistory->getSubscriber() === $this) {
                 $subscriptionHistory->setSubscriber(null);
             }
@@ -217,7 +223,6 @@ class User
     public function removePlaylistSubscription(PlaylistSubscription $playlistSubscription): static
     {
         if ($this->playlistSubscriptions->removeElement($playlistSubscription)) {
-            // set the owning side to null (unless already changed)
             if ($playlistSubscription->getSubscriber() === $this) {
                 $playlistSubscription->setSubscriber(null);
             }
@@ -247,7 +252,6 @@ class User
     public function removePlaylist(Playlist $playlist): static
     {
         if ($this->playlists->removeElement($playlist)) {
-            // set the owning side to null (unless already changed)
             if ($playlist->getCreator() === $this) {
                 $playlist->setCreator(null);
             }
@@ -277,12 +281,28 @@ class User
     public function removeWatchHistory(WatchHistory $watchHistory): static
     {
         if ($this->watchHistories->removeElement($watchHistory)) {
-            // set the owning side to null (unless already changed)
             if ($watchHistory->getWatcher() === $this) {
                 $watchHistory->setWatcher(null);
             }
         }
 
+        return $this;
+    }
+
+    // Ajout de la méthode getRoles pour la gestion des rôles
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // Toujours retourner un rôle par défaut (ROLE_USER) si aucun n'est défini
+        if (empty($roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+        return $roles;
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
         return $this;
     }
 }
