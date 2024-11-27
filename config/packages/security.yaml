@@ -5,14 +5,19 @@ security:
                 class: App\Entity\User
                 property: email
 
+        new_user_provider:
+            entity:
+                class: App\Entity\NewUser
+                property: username
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false  # Allow unauthenticated access for development pages
+            security: false  
 
         main:
             lazy: true
-            provider: app_user_provider
+            provider: new_user_provider 
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -20,10 +25,10 @@ security:
                 enable_csrf: true
             logout:
                 path: app_logout
-            # Replace "anonymous: true" with "security: false" to allow unauthenticated access to login page
-            security: false  # Allows unauthenticated access for routes like login or registration
+            security: false 
 
     role_hierarchy:
+        ROLE_USER: []
         ROLE_ADMIN: [ROLE_USER]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_USER]
 
