@@ -1,6 +1,4 @@
 security:
-    enable_authenticator_manager: true
-
     providers:
         app_user_provider:
             entity:
@@ -10,7 +8,7 @@ security:
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+            security: false  # Allow unauthenticated access for development pages
 
         main:
             lazy: true
@@ -22,9 +20,8 @@ security:
                 enable_csrf: true
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
-            anonymous: true
+            # Replace "anonymous: true" with "security: false" to allow unauthenticated access to login page
+            security: false  # Allows unauthenticated access for routes like login or registration
 
     role_hierarchy:
         ROLE_ADMIN: [ROLE_USER]
