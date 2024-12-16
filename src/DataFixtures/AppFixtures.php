@@ -18,8 +18,8 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Exemple : Création de 3 utilisateurs
         $user1 = new User();
+        $user1->setUsername('user1');
         $user1->setEmail('user1@example.com');
         $hashedPassword = $this->passwordHasher->hashPassword($user1, 'password123');
         $user1->setPassword($hashedPassword);
@@ -27,18 +27,20 @@ class AppFixtures extends Fixture
         $manager->persist($user1);
 
         $admin = new User();
+        $admin->setUsername('admin'); 
         $admin->setEmail('admin@example.com');
         $hashedPassword = $this->passwordHasher->hashPassword($admin, 'adminpassword');
         $admin->setPassword($hashedPassword);
         $admin->setRoles(['ROLE_ADMIN']);
         $manager->persist($admin);
 
-        $superAdmin = new User();
-        $superAdmin->setEmail('superadmin@example.com');
-        $hashedPassword = $this->passwordHasher->hashPassword($superAdmin, 'superpassword');
-        $superAdmin->setPassword($hashedPassword);
-        $superAdmin->setRoles(['ROLE_SUPER_ADMIN']);
-        $manager->persist($superAdmin);
+        $bannedUser = new User();
+        $bannedUser->setUsername('banned'); 
+        $bannedUser->setEmail('banned@example.com');
+        $hashedPassword = $this->passwordHasher->hashPassword($bannedUser, 'bannedpassword');
+        $bannedUser->setPassword($hashedPassword);
+        $bannedUser->setRoles(['ROLE_BANNED']);
+        $manager->persist($bannedUser);
 
         $manager->flush();
     }

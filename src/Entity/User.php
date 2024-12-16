@@ -72,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->roles = ['ROLE_USER']; 
         $this->comments = new ArrayCollection();
         $this->subscriptionHistories = new ArrayCollection();
         $this->playlistSubscriptions = new ArrayCollection();
@@ -292,20 +293,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        if (empty($roles)) {
+    
+        if (!in_array('ROLE_USER', $roles, true)) {
             $roles[] = 'ROLE_USER';
         }
-        return $roles;
+    
+        return array_unique($roles);
+    }
+    
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+       
     }
 
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
         return $this;
-    }
-
-    public function eraseCredentials(): void
-    {
-        // Clean sensitive data if necessary
     }
 }

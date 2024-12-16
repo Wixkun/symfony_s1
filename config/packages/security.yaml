@@ -5,10 +5,9 @@ security:
                 class: App\Entity\User
                 property: email
 
-        new_user_provider:
-            entity:
-                class: App\Entity\NewUser
-                property: username
+    password_hashers:
+        App\Entity\User:
+            algorithm: auto
 
     firewalls:
         dev:
@@ -17,21 +16,28 @@ security:
 
         main:
             lazy: true
-            provider: new_user_provider 
+            provider: app_user_provider
             form_login:
-                login_path: app_login
-                check_path: app_login
-                default_target_path: app_homepage
+                login_path: app_login       
+                check_path: app_login       
+                default_target_path: app_homepage  
                 enable_csrf: true
             logout:
-                path: app_logout
-            security: false 
+                path: app_logout           
+            custom_authenticator: App\Security\AppAuthenticator
+            entry_point: form_login        
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800           
+                path: /
+                # always_remember_me: true  
 
     role_hierarchy:
-        ROLE_USER: []
-        ROLE_ADMIN: [ROLE_USER]
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_USER]
+        ROLE_BANNED: []                  
+        ROLE_USER: [ROLE_BANNED]         
+        ROLE_ADMIN: [ROLE_USER, ROLE_BANNED] 
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/banned, roles: ROLE_BANNED } 
+        - { path: ^/profile, roles: ROLE_USER }  
+        - { path: ^/admin, roles: ROLE_ADMIN }    
