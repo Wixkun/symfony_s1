@@ -42,6 +42,14 @@ class AppFixtures extends Fixture
         $bannedUser->setRoles(['ROLE_BANNED']);
         $manager->persist($bannedUser);
 
+        $alexis = new User();
+        $alexis->setUsername('alexis');
+        $alexis->setEmail('alexismontoya2004@gmail.com');
+        $hashedPassword = $this->passwordHasher->hashPassword($alexis, 'pwd');
+        $alexis->setPassword($hashedPassword);
+        $alexis->setRoles(['ROLE_ADMIN']);
+        $manager->persist($alexis);
+
         $manager->flush();
     }
 }

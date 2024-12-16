@@ -6,21 +6,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Uid\Uuid;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthController extends AbstractController
 {
-    private Security $security;
-
-    public function __construct(Security $security)
-    {
-        $this->security = $security;
-    }
-
     #[Route(path: '/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -33,16 +28,10 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route(path: '/logout', name: 'app_logout', methods: ['GET'])]
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
-    }
-
-    #[Route(path: '/register', name: 'page_register', methods: ['GET', 'POST'])]
-    public function register(): Response
-    {
-        return $this->render('auth/register.html.twig');
+        throw new \LogicException('Cette méthode peut rester vide - elle sera interceptée par le firewall.');
     }
 
     #[Route(path: '/forgot', name: 'page_forgot_password', methods: ['GET'])]
@@ -52,8 +41,11 @@ class AuthController extends AbstractController
     }
 
     #[Route(path: '/forgot/submit', name: 'submit_forgot_password', methods: ['POST'])]
-    public function handleForgotPassword(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function handleForgotPassword(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MailerInterface $mailer
+    ): Response {
         $email = $request->get('_email');
 
         if (!$email) {
@@ -74,30 +66,52 @@ class AuthController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Un email de réinitialisation a été envoyé.');
+        $resetLink = $this->generateUrl(
+            'page_reset_password',
+            ['token' => $resetToken],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $emailMessage = (new TemplatedEmail())
+            ->from('hello@example.com')
+            ->to($email)
+            ->subject('Réinitialisation de votre mot de passe')
+            ->htmlTemplate('email/reset_email.html.twig')
+            ->context([
+                'reset_link' => $resetLink,
+                'user_email' => $email,
+            ]);
+
+        $mailer->send($emailMessage);
+
+        $this->addFlash('success', 'Un email de réinitialisation a été envoyé à votre adresse email.');
         return $this->redirectToRoute('page_forgot_password');
     }
 
     #[Route(path: '/reset/{token}', name: 'page_reset_password', methods: ['GET', 'POST'])]
-    public function resetPassword(string $token, Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function resetPassword(
+        string $token,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
         $user = $entityManager->getRepository(User::class)->findOneBy(['resetToken' => $token]);
 
         if (!$user) {
-            $this->addFlash('error', 'Token de réinitialisation invalide.');
+            $this->addFlash('error', 'Le lien de réinitialisation est invalide ou expiré.');
             return $this->redirectToRoute('page_forgot_password');
         }
 
         if ($request->isMethod('POST')) {
-            $newPassword = $request->request->get('password');
+            $password = $request->request->get('password');
+            $repeatPassword = $request->request->get('repeat_password');
 
-            if (!$newPassword) {
-                $this->addFlash('error', 'Veuillez entrer un nouveau mot de passe.');
+            if ($password !== $repeatPassword) {
+                $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
                 return $this->redirectToRoute('page_reset_password', ['token' => $token]);
             }
 
-            $user->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
-            $user->setResetToken(null);
+            $user->setPassword(password_hash($password, PASSWORD_BCRYPT));
+            $user->setResetToken(null); 
 
             $entityManager->persist($user);
             $entityManager->flush();
