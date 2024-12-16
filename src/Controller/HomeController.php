@@ -8,13 +8,19 @@ use App\Entity\Subscription;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
     #[Route(path: '/', name: 'page_hello')]
-    public function accueil()
+    public function index(): Response
     {
-        return $this->render('index.html.twig');
+        $user = $this->getUser();
+
+        $username = $user ? $user->getUserIdentifier() : 'Anonyme';
+
+        return $this->render('index.html.twig', [
+            'username' => $username,
+        ]);
     }
 }
